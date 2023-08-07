@@ -2,7 +2,7 @@
   "expo": {
     "name": "ValiSign",
     "slug": "ValiSign",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./app/assets/splashScreen/icon.png",
     "userInterfaceStyle": "light",
@@ -15,12 +15,14 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.akashmittal.ValiSign"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.akashmittal.ValiSign"
     },
     "web": {
       "favicon": "./assets/favicon.png"
