@@ -10,6 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 .vscode/
+.aes-module/
 ConfigTest.js
 
 # macOS

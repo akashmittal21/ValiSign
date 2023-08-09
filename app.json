@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.akashmittal.ValiSign"
+      "bundleIdentifier": "com.ideabytes.ValiSign"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,6 +31,14 @@
       "eas": {
         "projectId": "b944396a-f1f6-4e35-a0b6-c14ec4b2f123"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
+    ]
   }
 }
