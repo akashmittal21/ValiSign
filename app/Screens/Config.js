@@ -1,9 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import "./shim.js";
+import "../../shim.js";
 import DeviceInfo from "react-native-device-info";
 import crypto from "crypto";
 import { NetworkInfo } from "react-native-network-info";
-// import { fromString } from "uint8arrays/from-string";
 // import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 
@@ -15,7 +14,6 @@ const generateRandomKey = () => {
   for (let i = 0; i < keyLength; i++) {
     key += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  console.log(key);
   return key;
 };
 
