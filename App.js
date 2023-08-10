@@ -9,36 +9,37 @@ import { NavigationContainer } from "@react-navigation/native";
 
 export default function App() {
   // For Testing if config object is being generated
-  useEffect(() => {
-    testSaveConfig(); // Call the function here
-  }, []);
-
-  const testSaveConfig = async () => {
-    try {
-      await saveConfig();
-      console.log("saveConfig function executed successfully");
-    } catch (error) {
-      console.error("Error testing saveConfig:", error);
-    }
-  };
-  // The lines of above code are for testing purposes only
-
   // useEffect(() => {
-  //   checkFirstTimeLaunch();
-  //   createTables();
+  //   testSaveConfig(); // Call the function here
   // }, []);
 
-  // const checkFirstTimeLaunch = async () => {
+  // const testSaveConfig = async () => {
   //   try {
-  //     const isFirstTime = await AsyncStorage.getItem("isFirstTime");
-  //     if (!isFirstTime) {
-  //       await saveConfig();
-  //       await AsyncStorage.setItem("isFirstTime", "true");
-  //     }
+  //     await saveConfig();
+  //     console.log("saveConfig function executed successfully");
   //   } catch (error) {
-  //     console.error("Error checking first time launch:", error);
+  //     console.error("Error testing saveConfig:", error);
   //   }
   // };
+  // The lines of above code are for testing purposes only
+
+  useEffect(() => {
+    checkFirstTimeLaunch();
+    createTables();
+  }, []);
+
+  const checkFirstTimeLaunch = async () => {
+    try {
+      const isFirstTime = await AsyncStorage.getItem("isFirstTime");
+      if (!isFirstTime) {
+        await saveConfig();
+        await AsyncStorage.setItem("isFirstTime", "true");
+        console.log(checkFirstTimeLaunch);
+      }
+    } catch (error) {
+      console.error("Error checking first time launch:", error);
+    }
+  };
 
   return <WelcomeScreen />;
   // return <HomeScreen />;

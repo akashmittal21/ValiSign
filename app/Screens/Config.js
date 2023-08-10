@@ -49,15 +49,22 @@ const generateConfig = async () => {
   const deviceType = DeviceInfo.getSystemName();
   const deviceIp = await NetworkInfo.getIPAddress();
   const deviceLocation = await getLocation();
-  const firstDataKey = generateRandomKey(); // is going to be saved for further decryption stored in FirstTimeUsage
+  const firstDataKey = generateRandomKey(); // is going to be saved for further decryption stored in FirstTimeUsage LOCAL DATABASE
   const data = {
     checkPhrase: "ValiSign Calling",
     deviceId: DeviceInfo.getUniqueId(),
     deviceType,
     deviceLocation,
     deviceIp,
-    datakey: firstDataKey,
+    datakey: firstDataKey, // this key will be saved on the device after first configuration
   };
+
+  // Three keys:     1. One of the 8 keys ---> config api payload ----> random
+  //                 2. Genreated on the device -----> encrypt login information for first time login/ further logins (maybe) ----> random
+  //                 3. Generated on the server -----> is going to be sent after first successul login ----> updated after a certain period of time based on secuirty policy
+
+  // Server data key -----> only sent during first time login (if login is successful) OR during security update (based on policy)----> further encryption of all data
+  // is going to be stored on server side as well local database ----> subjeted to change based on the security policy
 
   const encryptionKeys = [
     "T5$okm.$DgZk2Ub.6AJZs%/Cn5pPvRCu",
