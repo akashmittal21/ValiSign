@@ -12,6 +12,7 @@ web-build/
 .vscode/
 .aes-module/
 ConfigTest.js
+.gitignore
 
 # macOS
 .DS_Store
