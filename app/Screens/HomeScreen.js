@@ -116,7 +116,6 @@ function HomeScreen() {
               fontWeight: "bold",
               fontSize: 18,
             }}
-            onChangeItem={(item) => setApplications(item.value)}
             itemSeparator={true}
           />
         </View>

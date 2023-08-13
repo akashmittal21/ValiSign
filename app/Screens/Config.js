@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { NetworkInfo } from "react-native-network-info";
 // import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
+import axios from "axios";
 
 const generateRandomKey = () => {
   const keyLength = 32; // For AES-256 Bit Encrytion
@@ -59,7 +60,7 @@ const generateConfig = async () => {
     datakey: firstDataKey, // this key will be saved on the device after first configuration
   };
 
-  // Three keys:     1. One of the 8 keys ---> config api payload ----> random
+  // Three keys:     1. One of the 8 keys ----> config api payload ----> random
   //                 2. Genreated on the device -----> encrypt login information for first time login/ further logins (maybe) ----> random
   //                 3. Generated on the server -----> is going to be sent after first successul login ----> updated after a certain period of time based on secuirty policy
 
@@ -132,6 +133,13 @@ const saveConfig = async () => {
     const jsonConfig = JSON.stringify(config);
     await AsyncStorage.setItem("Config", jsonConfig);
     console.log("Config saved:", jsonConfig);
+
+    // Making the API request
+    // const response = await axios.post(
+    //   "https://dev.valisign.aitestpro.com/api/vs/app/configure",
+    //   config
+    // );
+    // console.log("API request successful:", response.data);
   } catch (error) {
     console.error("Error saving config:", error);
   }

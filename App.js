@@ -6,8 +6,12 @@ import saveConfig from "./app/Screens/Config";
 import createTables from "./app/Screens/DatabaseSetup";
 import HomeScreen from "./app/Screens/HomeScreen";
 import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import "react-native-gesture-handler";
 
 export default function App() {
+  const Stack = createStackNavigator();
+
   // For Testing if config object is being generated
   // useEffect(() => {
   //   testSaveConfig(); // Call the function here
@@ -25,7 +29,6 @@ export default function App() {
 
   useEffect(() => {
     checkFirstTimeLaunch();
-    createTables();
   }, []);
 
   const checkFirstTimeLaunch = async () => {
@@ -33,6 +36,7 @@ export default function App() {
       const isFirstTime = await AsyncStorage.getItem("isFirstTime");
       if (!isFirstTime) {
         await saveConfig();
+        await createTables();
         await AsyncStorage.setItem("isFirstTime", "true");
         console.log(checkFirstTimeLaunch);
       }
@@ -40,7 +44,15 @@ export default function App() {
       console.error("Error checking first time launch:", error);
     }
   };
+  // return (
+  //   <NavigationContainer>
+  //     <Stack.Navigator initialRouteName="Welcome">
+  //       <Stack.Screen name="Welcome" component={WelcomeScreen} r />
+  //       <Stack.Screen name="Home" component={HomeScreen} />
+  //     </Stack.Navigator>
+  //   </NavigationContainer>
+  // );
 
-  return <WelcomeScreen />;
-  // return <HomeScreen />;
+  // return <WelcomeScreen />;
+  return <HomeScreen />;
 }

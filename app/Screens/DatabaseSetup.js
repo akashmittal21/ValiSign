@@ -8,7 +8,7 @@ const db = SQLite.openDatabase(
   }
 );
 
-const createTables = () => {
+const createTables = async () => {
   db.transaction((tx) => {
     // Table to track first-time usage
     tx.executeSql(

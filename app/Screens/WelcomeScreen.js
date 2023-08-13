@@ -16,9 +16,16 @@ import {
 import FeatherIcons from "react-native-vector-icons/Feather";
 import Fontiso from "react-native-vector-icons/Fontisto";
 import Feather from "@expo/vector-icons/Feather";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 
 function WelcomeScreen() {
+  // const navigation = useNavigation();
+
+  const handleLogin = () => {
+    // navigation.navigate("Home");
+  };
+
   const [IdText, onChangeID] = React.useState("");
   const [IdEmailNum, onChangeText] = React.useState("");
   const [IdPassword, onChangePassword] = React.useState("");
@@ -80,7 +87,7 @@ function WelcomeScreen() {
                 style={[styles.button, (width = "100%")]}
                 backgroundColor="#004E8E"
                 borderRadius={10}
-                onPress={() => Alert.alert("Successful Login!")}
+                onPress={handleLogin}
               >
                 Login
               </Feather.Button>
