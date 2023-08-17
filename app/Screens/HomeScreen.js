@@ -10,20 +10,20 @@ import {
   Text,
   Animated,
 } from "react-native";
-// import { Dropdown } from "react-native-element-dropdown";
-import DropDownPicker from "react-native-dropdown-picker";
+import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { useNavigation } from "@react-navigation/native";
 
-function HomeScreen() {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [application, setApplications] = useState([
+function HomeScreen({ navigation }) {
+  const application = [
     { label: "GroupBenfitz", value: "groupbenefits" },
     { label: "DGSMS", value: "dgsms" },
     // Add more options as needed
-  ]);
+  ];
+
+  const [dropdown, selectDropdown] = useState(null);
+  const [select, selected] = useState(null);
 
   // const windowWidth = Dimensions.get("window").width;
   const [showPopup, setShowPopup] = useState(false);
@@ -84,40 +84,31 @@ function HomeScreen() {
       style={styles.background}
     >
       <SafeAreaView style={styles.container}>
-        <Image
-          source={require("../assets/HomeScreen/valisign.png")}
-          style={styles.logo}
-        />
+        <View style={styles.header}>
+          <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
+            style={styles.menuIcon}
+            onPress={() => navigation.openDrawer()}
+          >
+            <MaterialCommunityIcons name="menu" size={24} color="white" />
+          </TouchableOpacity>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("../assets/HomeScreen/valisign.png")}
+              style={styles.logo}
+            />
+          </View>
+        </View>
         <View style={styles.line} />
         <View style={styles.dropdownContainer}>
-          <DropDownPicker
-            open={open}
-            value={value}
-            items={application}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setApplications}
-            // searchable={true}
-            searchTextInputProps={{
-              maxLength: 25,
-            }}
-            placeholder="Select Application"
-            placeholderStyle={{
-              fontSize: 18,
-              // fontWeight: "bold",
-            }}
-            listItemLabelStyle={{
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
+          <Dropdown
             style={styles.dropdown}
-            itemStyle={styles.dropdownItem}
-            listItemContainerStyle={{
-              backgroundColor: "white",
-              fontWeight: "bold",
-              fontSize: 18,
-            }}
-            itemSeparator={true}
+            containerStyle={styles.shadow}
+            data={application}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Application"
+            value={dropdown}
+            onChange={(item) => selectDropdown(item.value)}
           />
         </View>
         <View style={styles.buttonContainer}>
@@ -125,6 +116,7 @@ function HomeScreen() {
             style={styles.getCodeButton}
             onPress={handleValisginCode}
           >
+            {/* <Image source={require("../assets/HomeScreen/button.png")} /> */}
             <Text style={styles.buttonText}>Get ValiSign Code</Text>
           </TouchableOpacity>
         </View>
@@ -252,6 +244,18 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     backgroundColor: "white",
+    borderRadius: 12,
+    padding: 7,
+    paddingLeft: 13,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
   },
   dropdownItem: {
     justifyContent: "flex-start",
@@ -270,8 +274,10 @@ const styles = StyleSheet.create({
     margin: 260, // make the change here to add it to the middle of the screen
   },
   header: {
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 100,
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
   },
   line: {
     borderBottomWidth: 1,
@@ -283,9 +289,12 @@ const styles = StyleSheet.create({
   logo: {
     width: "55%",
     height: 100,
-    // marginTop: 50,
     alignSelf: "center",
     resizeMode: "contain", // Use resizeMode to fit the image within the container
+  },
+  logoContainer: {
+    flex: 1, // Occupy remaining space to center the logo
+    alignItems: "center", // Center the logo horizontally
   },
   popupContent: {
     // backgroundColor: "#27bbff",
@@ -305,6 +314,16 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
+  },
+  shadow: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
 });
 
