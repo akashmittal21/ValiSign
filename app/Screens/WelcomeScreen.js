@@ -20,10 +20,10 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 
 function WelcomeScreen() {
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const handleLogin = () => {
-    // navigation.navigate("Home");
+    navigation.navigate("Home");
   };
 
   const [IdText, onChangeID] = React.useState("");

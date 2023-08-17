@@ -10,6 +10,7 @@ import {
   Text,
   Animated,
 } from "react-native";
+// import { Dropdown } from "react-native-element-dropdown";
 import DropDownPicker from "react-native-dropdown-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
@@ -124,7 +125,6 @@ function HomeScreen() {
             style={styles.getCodeButton}
             onPress={handleValisginCode}
           >
-            {/* <Image source={require("../assets/HomeScreen/button.png")} /> */}
             <Text style={styles.buttonText}>Get ValiSign Code</Text>
           </TouchableOpacity>
         </View>
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#004E8E",
     alignSelf: "center",
-    margin: 610,
+    margin: 260, // make the change here to add it to the middle of the screen
   },
   header: {
     alignItems: "center",

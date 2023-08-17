@@ -22,7 +22,8 @@ const createTables = async () => {
       }
     );
 
-    // Pre-existing random keys set of 8
+    // Pre-existing random keys set of 8 remove them after initialization
+    // after the app update it's going to be configured again
     tx.executeSql(
       "CREATE TABLE IF NOT EXISTS EncryptionKeys (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT)",
       [],
@@ -34,8 +35,10 @@ const createTables = async () => {
       }
     );
 
+    // Time needs to be stored as UTC and displayed in the local time zone
+    // don't store username, password locally
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS TransactionLogs (id INTEGER PRIMARY KEY AUTOINCREMENT, application TEXT, transactionStatus TEXT, transactionMessage TEXT)", // Need to add fields
+      "CREATE TABLE IF NOT EXISTS TransactionLogs (id INTEGER PRIMARY KEY AUTOINCREMENT, application TEXT, transactionStatus TEXT, transactionMessage TEXT, dateTime TIMESTAMP)", // Need to add fields
       [],
       () => {
         console.log("TransactionLogs table created successfully");

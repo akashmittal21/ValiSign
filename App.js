@@ -7,10 +7,13 @@ import createTables from "./app/Screens/DatabaseSetup";
 import HomeScreen from "./app/Screens/HomeScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import SideDrawer from "./app/Screens/SideDrawer";
 import "react-native-gesture-handler";
 
 export default function App() {
   const Stack = createStackNavigator();
+  const Drawer = createDrawerNavigator();
 
   // For Testing if config object is being generated
   // useEffect(() => {
@@ -44,15 +47,29 @@ export default function App() {
       console.error("Error checking first time launch:", error);
     }
   };
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName="Welcome"
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Home" component={SideDrawer} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
   // return (
   //   <NavigationContainer>
-  //     <Stack.Navigator initialRouteName="Welcome">
-  //       <Stack.Screen name="Welcome" component={WelcomeScreen} r />
-  //       <Stack.Screen name="Home" component={HomeScreen} />
-  //     </Stack.Navigator>
+  //     <Drawer.Navigator
+  //       initialRouteName="Welcome"
+  //       screenOptions={{ headerShown: false }}
+  //     >
+  //       <Drawer.Screen name="Welcome" component={WelcomeScreen} />
+  //       <Drawer.Screen name="Home" component={HomeScreen} />
+  //     </Drawer.Navigator>
   //   </NavigationContainer>
   // );
 
   // return <WelcomeScreen />;
-  return <HomeScreen />;
+  // return <HomeScreen />;
 }
