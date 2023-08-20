@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -9,9 +9,10 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  Animated,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, StackActions } from "@react-navigation/native";
 
 const TransactionStatusColors = {
   success: "#00AA00",
@@ -35,10 +36,10 @@ function TransactionCard({ date, time, appName, status, message }) {
   );
 }
 
-function TransactionHistory({ navigation }) {
+function TransactionHistory() {
   const [transactions, setTransactions] = useState([
     {
-      date: "2023-08-17",
+      date: "23-08-17",
       time: "10:30 AM",
       appName: "Sample App 1",
       status: "success",
@@ -60,6 +61,27 @@ function TransactionHistory({ navigation }) {
     },
     // Add more transactions as needed
   ]);
+
+  const navigation = useNavigation();
+
+  const [animationValue] = useState(new Animated.Value(1));
+
+  const handleOnPress = () => {
+    // Trigger the animation by updating the animation value
+    Animated.timing(animationValue, {
+      toValue: 0.8,
+      duration: 10,
+      useNativeDriver: true,
+    }).start(() => {
+      // After the animation is complete, navigate to the home screen
+      navigation.dispatch(StackActions.replace("Home"));
+    });
+  };
+
+  useEffect(() => {
+    // Reset the animation value when the component mounts
+    animationValue.setValue(1);
+  }, []);
 
   const sortTransactionsByDate = () => {
     const sortedTransactions = [...transactions].sort((a, b) =>
@@ -94,6 +116,19 @@ function TransactionHistory({ navigation }) {
               style={styles.logo}
             />
           </View>
+          <Animated.View
+            style={[
+              styles.menuIcon,
+              { transform: [{ scale: animationValue }] },
+            ]}
+          >
+            <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
+              style={styles.menuIcon}
+              onPress={handleOnPress}
+            >
+              <MaterialCommunityIcons name="home" size={24} color="white" />
+            </TouchableOpacity>
+          </Animated.View>
         </View>
         <View style={styles.line} />
         <View style={styles.headingContainer}>

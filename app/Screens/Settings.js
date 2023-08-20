@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -12,9 +12,30 @@ import {
 } from "react-native";
 // import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, StackActions } from "@react-navigation/native";
 
-function Settings({ navigation }) {
+function Settings() {
+  const navigation = useNavigation();
+
+  const [animationValue] = useState(new Animated.Value(1));
+
+  const handleOnPress = () => {
+    // Trigger the animation by updating the animation value
+    Animated.timing(animationValue, {
+      toValue: 0.8,
+      duration: 10,
+      useNativeDriver: true,
+    }).start(() => {
+      // After the animation is complete, navigate to the home screen
+      navigation.dispatch(StackActions.replace("Home"));
+    });
+  };
+
+  useEffect(() => {
+    // Reset the animation value when the component mounts
+    animationValue.setValue(1);
+  }, []);
+
   return (
     <ImageBackground
       source={require("../assets/login/background.png")}
@@ -34,6 +55,19 @@ function Settings({ navigation }) {
               style={styles.logo}
             />
           </View>
+          <Animated.View
+            style={[
+              styles.menuIcon,
+              { transform: [{ scale: animationValue }] },
+            ]}
+          >
+            <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
+              style={styles.menuIcon}
+              onPress={handleOnPress}
+            >
+              <MaterialCommunityIcons name="home" size={24} color="white" />
+            </TouchableOpacity>
+          </Animated.View>
         </View>
         <View style={styles.line} />
       </SafeAreaView>

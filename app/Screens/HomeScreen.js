@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Text,
   Animated,
+  Easing,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -36,12 +37,70 @@ function HomeScreen({ navigation }) {
   const handleValisginCode = () => {
     const generateCode = "ABCD123";
     setCode(generateCode);
-    setShowPopup(true);
-    Animated.timing(popupOpacity, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true, // Add this line for better performance on native
-    }).start();
+
+    // Animate the button into the popup
+    Animated.parallel([
+      Animated.timing(popupScale, {
+        // toValue: 1.8, // Enlarge the scale
+        duration: 100,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(popupOpacity, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowPopup(true);
+      // Animate the popup content
+      Animated.parallel([
+        Animated.timing(popupOpacity, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(popupScale, {
+          toValue: 1,
+          duration: 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
+  };
+
+  const closePopup = () => {
+    // Animate the popup content out
+    Animated.parallel([
+      Animated.timing(popupOpacity, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(popupScale, {
+        // toValue: 1.2, // Enlarge the scale
+        duration: 100,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowPopup(false);
+      // Animate the button back in
+      Animated.parallel([
+        Animated.timing(popupScale, {
+          toValue: 1,
+          duration: 100,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(popupOpacity, {
+          toValue: 1,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    });
   };
 
   const handleOnComplete = () => {
@@ -53,28 +112,6 @@ function HomeScreen({ navigation }) {
     }).start(() => {
       setShowPopup(false);
       setCode("");
-    });
-  };
-
-  const closePopup = () => {
-    // Start the popup closing animation
-    Animated.parallel([
-      Animated.timing(popupOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(popupScale, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setShowPopup(false);
-      setCode("");
-      // Reset the animated values for the next popup display
-      popupOpacity.setValue(1);
-      popupScale.setValue(1);
     });
   };
 
@@ -112,13 +149,19 @@ function HomeScreen({ navigation }) {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.getCodeButton}
-            onPress={handleValisginCode}
-          >
-            {/* <Image source={require("../assets/HomeScreen/button.png")} /> */}
-            <Text style={styles.buttonText}>Get ValiSign Code</Text>
-          </TouchableOpacity>
+          {/* Button */}
+          {!showPopup && (
+            <Animated.View
+              style={[
+                styles.getCodeButton,
+                { transform: [{ scale: popupScale }] },
+              ]}
+            >
+              <TouchableOpacity onPress={handleValisginCode}>
+                <Text style={styles.buttonText}>Get ValiSign Code</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
         </View>
       </SafeAreaView>
       {/* This is going to be the popup that displays the code. */}
@@ -261,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   getCodeButton: {
-    width: "80%",
+    width: "45%",
     borderColor: "white",
     borderWidth: 1,
     height: 50,

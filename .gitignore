@@ -13,6 +13,7 @@ web-build/
 .aes-module/
 ConfigTest.js
 .gitignore
+HomeScreenTest.js
 
 # macOS
 .DS_Store

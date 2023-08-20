@@ -94,10 +94,10 @@ function SideDrawer() {
       }}
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
-      {/* <Drawer.Screen name="Login" component={HomeScreen} /> */}
-      <Drawer.Screen name="Login">
+      <Drawer.Screen name="Login" component={HomeScreen} />
+      {/* <Drawer.Screen name="Login">
         {(props) => <HomeScreen {...props} navigation={props.navigation} />}
-      </Drawer.Screen>
+      </Drawer.Screen> */}
       <Drawer.Screen name="History" component={TransactionHistory} />
       <Drawer.Screen name="Settings" component={Settings} />
       {/* Add more screens for the drawer */}
