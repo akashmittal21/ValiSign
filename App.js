@@ -15,6 +15,9 @@ export default function App() {
   const Stack = createStackNavigator();
   const Drawer = createDrawerNavigator();
 
+  const handleBeforeRemove = (e) => {
+    e.preventDefault();
+  };
   // For Testing if config object is being generated
   // useEffect(() => {
   //   testSaveConfig(); // Call the function here
@@ -38,8 +41,8 @@ export default function App() {
     try {
       const isFirstTime = await AsyncStorage.getItem("isFirstTime");
       if (!isFirstTime) {
-        await saveConfig();
         await createTables();
+        await saveConfig();
         await AsyncStorage.setItem("isFirstTime", "true");
         console.log(checkFirstTimeLaunch);
       }
@@ -51,7 +54,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Welcome"
-        screenOptions={{ headerShown: false }}
+        screenOptions={{ headerShown: false, gestureEnabled: false }}
       >
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Home" component={SideDrawer} />

@@ -14,6 +14,7 @@ web-build/
 ConfigTest.js
 .gitignore
 HomeScreenTest.js
+TransactionHistoryTest.js
 
 # macOS
 .DS_Store

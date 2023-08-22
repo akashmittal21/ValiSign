@@ -70,7 +70,7 @@ function CustomDrawerContent({ navigation, state }) {
       </DrawerContentScrollView>
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => console.log("Logout pressed")}
+        onPress={() => navigation.navigate("Welcome")}
       >
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>

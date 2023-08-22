@@ -10,12 +10,13 @@ import {
   Text,
   FlatList,
   Animated,
+  ScrollView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, StackActions } from "@react-navigation/native";
 
 const TransactionStatusColors = {
-  success: "#00AA00",
+  Success: "#00AA00",
   pending: "#FFA500",
   failed: "#FF0000",
 };
@@ -28,7 +29,7 @@ function TransactionCard({ date, time, appName, status, message }) {
       <View style={styles.cardHeader}>
         <Text style={styles.date}>{date}</Text>
         {/* <Text style={styles.time}>{time}</Text> */}
-        <Text style={[styles.status, { color: statusColor }]}>{status}</Text>
+        {/* <Text style={[styles.status, { color: statusColor }]}>{status}</Text> */}
       </View>
       <Text style={styles.appName}>{appName}</Text>
       <Text style={styles.message}>{message}</Text>
@@ -39,11 +40,12 @@ function TransactionCard({ date, time, appName, status, message }) {
 function TransactionHistory() {
   const [transactions, setTransactions] = useState([
     {
-      date: "23-08-17",
+      date: "2023-08-17",
       time: "10:30 AM",
-      appName: "Sample App 1",
-      status: "success",
-      message: "Transaction successful",
+      appName: "GroupBenifitz",
+      status: "Success",
+      message:
+        "Changed password, updated account details and updated broker information",
     },
     {
       date: "2023-08-16",
@@ -59,12 +61,26 @@ function TransactionHistory() {
       status: "failed",
       message: "Changed the transaction",
     },
+
     // Add more transactions as needed
   ]);
 
   const navigation = useNavigation();
 
+  const [expandedTransaction, setExpandedTransaction] = useState(null);
+
   const [animationValue] = useState(new Animated.Value(1));
+
+  const handleRowPress = (transaction) => {
+    setExpandedTransaction(
+      expandedTransaction === transaction ? null : transaction
+    );
+  };
+
+  useEffect(() => {
+    // Reset expanded transaction when the component mounts
+    setExpandedTransaction(null);
+  }, []);
 
   const handleOnPress = () => {
     // Trigger the animation by updating the animation value
@@ -83,6 +99,14 @@ function TransactionHistory() {
     animationValue.setValue(1);
   }, []);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleString("default", { month: "short" });
+    const day = date.getDate();
+    return `${month} ${day}`;
+  };
+
+  //
   const sortTransactionsByDate = () => {
     const sortedTransactions = [...transactions].sort((a, b) =>
       a.date.localeCompare(b.date)
@@ -90,6 +114,7 @@ function TransactionHistory() {
     setTransactions(sortedTransactions);
   };
 
+  // TODO: Add mutli-app selection support
   const sortTransactionsByAppName = () => {
     const sortedTransactions = [...transactions].sort((a, b) =>
       a.appName.localeCompare(b.appName)
@@ -104,7 +129,7 @@ function TransactionHistory() {
     >
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
+          <TouchableOpacity
             style={styles.menuIcon}
             onPress={() => navigation.openDrawer()}
           >
@@ -116,51 +141,53 @@ function TransactionHistory() {
               style={styles.logo}
             />
           </View>
-          <Animated.View
-            style={[
-              styles.menuIcon,
-              { transform: [{ scale: animationValue }] },
-            ]}
+          <TouchableOpacity
+            style={styles.menuIcon}
+            onPress={() => navigation.dispatch(StackActions.replace("Home"))}
           >
-            <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
-              style={styles.menuIcon}
-              onPress={handleOnPress}
-            >
-              <MaterialCommunityIcons name="home" size={24} color="white" />
-            </TouchableOpacity>
-          </Animated.View>
+            <MaterialCommunityIcons name="home" size={24} color="white" />
+          </TouchableOpacity>
         </View>
         <View style={styles.line} />
-        <View style={styles.headingContainer}>
-          {/* <Text style={styles.heading}>Transaction History</Text> */}
-          {/* <TouchableOpacity
-            onPress={sortTransactionsByDate}
-            style={styles.sortButton}
-          >
-            <MaterialIcons name="sort" size={24} color="#FFF" />
-            <Text style={styles.sortButtonText}>Sort by Date</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={sortTransactionsByAppName}
-            style={styles.sortButton}
-          >
-            <MaterialIcons name="sort" size={24} color="#FFF" />
-            <Text style={styles.sortButtonText}>Sort by App Name</Text>
-          </TouchableOpacity> */}
+        <Text style={styles.heading}>Transaction History</Text>
+        <View style={styles.tableContainer}>
+          <FlatList
+            data={transactions}
+            renderItem={({ item }) => (
+              <React.Fragment>
+                <TouchableOpacity
+                  onPress={() => handleRowPress(item)}
+                  style={[
+                    styles.row,
+                    expandedTransaction === item && styles.rowExpanded,
+                  ]}
+                >
+                  <Text style={styles.rowText}>{formatDate(item.date)}</Text>
+                  <Text style={styles.rowText}>{item.appName}</Text>
+                  <Text
+                    style={[
+                      styles.rowText,
+                      styles.statusText,
+                      { color: TransactionStatusColors[item.status] },
+                    ]}
+                  >
+                    {item.status}
+                  </Text>
+                </TouchableOpacity>
+                {expandedTransaction === item && (
+                  <TransactionCard
+                    date={item.date}
+                    time={item.time}
+                    appName={item.appName}
+                    status={item.status}
+                    message={item.message}
+                  />
+                )}
+              </React.Fragment>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
         </View>
-        <FlatList
-          data={transactions}
-          renderItem={({ item }) => (
-            <TransactionCard
-              date={item.date}
-              time={item.time}
-              appName={item.appName}
-              status={item.status}
-              message={item.message}
-            />
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
       </SafeAreaView>
     </ImageBackground>
   );
@@ -210,7 +237,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
+    color: "white",
     marginVertical: 10,
     alignSelf: "center",
   },
@@ -225,7 +252,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 25,
   },
   line: {
     borderBottomWidth: 1,
@@ -271,6 +298,66 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 14,
     color: "#333",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 10,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
+    backgroundColor: "#FFF",
+  },
+  rowExpanded: {
+    borderBottomWidth: 0,
+    backgroundColor: "lightgrey",
+  },
+  rowText: {
+    fontSize: 14,
+    color: "#333",
+    flex: 1,
+    flexDirection: "row",
+    textAlign: "center",
+  },
+  statusText: {
+    fontWeight: "bold",
+  },
+  expandedCard: {
+    position: "absolute",
+    top: "100%",
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 16,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  tableContainer: {
+    flex: 1,
+    // maxHeight: 300,
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 1.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginVertical: 5,
+    overflow: "hidden",
   },
 });
 

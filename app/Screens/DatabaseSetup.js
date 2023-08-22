@@ -1,5 +1,17 @@
 import SQLite from "react-native-sqlite-storage";
 
+const encryptionKeys = [
+  "T5$okm.$DgZk2Ub.6AJZs%/Cn5pPvRCu",
+  "Qy2fAMzYFZfqZzkcelcafohr%otYx^kx",
+  ".rkZG^qlBiNc&Zm4byRdXgi8ekvwlLbW",
+  "RsUQ&talPqu7C^tRHA&qyE$0Fg^RhK57",
+  "xX.u42bQ6HoamUc8OBXqLT9fhNy&a8b1",
+  ".ZC.1a4ZmQfVCOYKD9OANKI9SbgEGXUt",
+  "SdEoDJepnzz61zjwKuDyB9&.Q6Se3$w.",
+  "D/2FC5N6PVdd&g1QAC$CDl.4OHunESkZ",
+  "gYF%z07%ekh./P/X.e0LZ4kMHj14BY.o",
+];
+
 const db = SQLite.openDatabase(
   { name: "localDatabase.db", location: "default" },
   () => {},
@@ -29,22 +41,45 @@ const createTables = async () => {
       [],
       () => {
         console.log("EncrypyionKeys table created successfully");
+
+        for (const key of encryptionKeys) {
+          tx.executeSql(
+            "INSERT INTO EncryptionKeys (key) VALUES (?)",
+            [key],
+            () => {
+              console.log("Encryption Key stored successfully");
+            },
+            (error) => {
+              console.log("Error storing encryption keys: ", error);
+            }
+          );
+        }
       },
       (error) => {
         console.log("Error creating EncryptionKeys table: ", error);
       }
     );
 
-    // Time needs to be stored as UTC and displayed in the local time zone
-    // don't store username, password locally
+    // TODO: Time needs to be stored as UTC and displayed in the local time zone
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS TransactionLogs (id INTEGER PRIMARY KEY AUTOINCREMENT, application TEXT, transactionStatus TEXT, transactionMessage TEXT, dateTime TIMESTAMP)", // Need to add fields
+      "CREATE TABLE IF NOT EXISTS TransactionLogs (id INTEGER PRIMARY KEY AUTOINCREMENT, application TEXT, transactionStatus TEXT, transactionMessage TEXT, dateTime TIMESTAMP)",
       [],
       () => {
         console.log("TransactionLogs table created successfully");
       },
       (error) => {
         console.log("Error creating TransactionLogs table: ", error);
+      }
+    );
+
+    tx.executeSql(
+      "CREATE TABLE IF NOT EXISTS LoginDetails (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)",
+      [],
+      () => {
+        console.log("LoginDetails table created successfully");
+      },
+      (error) => {
+        console.log("Error creating LoginDetails table: ", error);
       }
     );
   });
