@@ -201,24 +201,38 @@ function HomeScreen({ navigation }) {
         <Animated.View
           style={[styles.popupContainer, { opacity: popupOpacity }]}
         >
-          <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
+          {/* <TouchableOpacity // Add TouchableOpacity to handle the dismissal of the popup
             style={styles.closeIconContainer}
             onPress={closePopup}
           >
-            {/* Use MaterialIcons or other icons, or simply a Text with "X" */}
             <MaterialCommunityIcons
               name="close-circle"
               size={24}
               color="white"
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style={styles.popupContent}>
+            <Text style={styles.headerText}>
+              GroupBenefitz wants you to validate the following transaction
+            </Text>
+            <View style={styles.transactionContainer}>
+              <Text style={styles.transactionText}>{message}</Text>
+            </View>
+            <Text style={styles.codeHeaderText}>Your ValiSign Code is</Text>
+            <View style={styles.codeContainer}>
+              {code.split("").map((char, index) => (
+                <View key={index} style={styles.codeBox}>
+                  <Text style={styles.codeText}>{char}</Text>
+                </View>
+              ))}
+            </View>
+            <Text style={styles.timerText}>Expiring in</Text>
             <View style={styles.countdownContainer}>
               <CountdownCircleTimer
                 isPlaying
                 duration={countdownTIme}
-                colors={["#FFF", "#FF8C8C", "#FF6666", "#FF3F3F", "#FF1919"]}
-                colorsTime={[60, 45, 30, 15, 0]}
+                colors={["#FFF", "#FF3F3F", "#FF1919"]}
+                colorsTime={[60, 55, 0]}
                 onComplete={handleOnComplete}
                 isSmoothColorTransition={true}
                 updateInterval={1}
@@ -229,16 +243,13 @@ function HomeScreen({ navigation }) {
                 )}
               </CountdownCircleTimer>
             </View>
-            <Text style={styles.additionalText}>Your ValiSign Code is</Text>
-            <View style={styles.codeContainer}>
-              {code.split("").map((char, index) => (
-                <View key={index} style={styles.codeBox}>
-                  <Text style={styles.codeText}>{char}</Text>
-                </View>
-              ))}
-            </View>
-            <Text style={styles.messageText}>{message}</Text>
           </View>
+          <TouchableOpacity
+            onPress={closePopup}
+            style={styles.cancelButtonContainer}
+          >
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
         </Animated.View>
       )}
     </ImageBackground>
@@ -251,8 +262,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 20,
-    marginBottom: -10, // Add some margin to create space between the countdown and the text
+    // marginTop: 20,
+    // marginBottom: -10, // Add some margin to create space between the countdown and the text
   },
   background: {
     flex: 1,
@@ -287,6 +298,29 @@ const styles = StyleSheet.create({
     // backgroundColor: "white",
     zIndex: 1, // Make sure the icon appears above the popup content
   },
+  cancelButtonContainer: {
+    // flex: 1,
+    marginTop: 40,
+    backgroundColor: "#FF3F3F",
+    justifyContent: "center",
+    alignSelf: "center",
+    borderColor: "white",
+    borderRadius: 10,
+    borderWidth: 1,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  cancelText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+    padding: 12,
+  },
   codeBox: {
     width: 40,
     height: 54,
@@ -299,13 +333,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   codeContainer: {
-    marginTop: 20,
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     // alignSelf: "center",
     flexWrap: "nowrap",
     paddingHorizontal: 20,
+  },
+  codeHeaderText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   codeText: {
     color: "black",
@@ -319,6 +360,7 @@ const styles = StyleSheet.create({
     qpaddingBottom: 20, // Add paddingBottom to push content up
   },
   countdownContainer: {
+    marginTop: 20,
     alignItems: "center",
   },
   countdownText: {
@@ -327,6 +369,10 @@ const styles = StyleSheet.create({
     // marginBottom: 10,
     textAlign: "center",
     color: "white",
+  },
+  disabledButton: {
+    backgroundColor: "#BFBFBF", // Grayed out background color
+    borderColor: "#BFBFBF",
   },
   dropdownContainer: {
     width: "90%",
@@ -369,6 +415,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
   },
+  headerText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   line: {
     borderBottomWidth: 1,
     borderBottomColor: "#FCFCFC",
@@ -385,13 +437,6 @@ const styles = StyleSheet.create({
   logoContainer: {
     flex: 1, // Occupy remaining space to center the logo
     alignItems: "center", // Center the logo horizontally
-  },
-  messageText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 20,
   },
   popupContent: {
     // backgroundColor: "#27bbff",
@@ -425,9 +470,28 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
-  disabledButton: {
-    backgroundColor: "#BFBFBF", // Grayed out background color
-    borderColor: "#BFBFBF",
+  timerText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  transactionContainer: {
+    backgroundColor: "white",
+    marginTop: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "black",
+  },
+  transactionText: {
+    // backgroundColor: "white",
+    color: "black",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    // marginTop: 10,
+    padding: 10,
   },
 });
 
