@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import WelcomeScreen from "./app/Screens/WelcomeScreen";
 import saveConfig from "./app/Screens/Config";
 import createTables from "./app/Screens/DatabaseSetup";
-import HomeScreen from "./app/Screens/HomeScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -20,11 +19,13 @@ export default function App() {
   };
   // For Testing if config object is being generated
   // useEffect(() => {
-  //   testSaveConfig(); // Call the function here
+  // testSaveConfig(); // Call the function here
   // }, []);
 
   // const testSaveConfig = async () => {
+  // await saveConfig();
   //   try {
+  //     await createTables();
   //     await saveConfig();
   //     console.log("saveConfig function executed successfully");
   //   } catch (error) {
@@ -43,6 +44,7 @@ export default function App() {
       if (!isFirstTime) {
         await createTables();
         await saveConfig();
+
         await AsyncStorage.setItem("isFirstTime", "true");
         console.log(checkFirstTimeLaunch);
       }
@@ -50,6 +52,7 @@ export default function App() {
       console.error("Error checking first time launch:", error);
     }
   };
+
   return (
     <NavigationContainer>
       <Stack.Navigator

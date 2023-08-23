@@ -18,7 +18,7 @@ import { useNavigation, StackActions } from "@react-navigation/native";
 const TransactionStatusColors = {
   Success: "#00AA00",
   pending: "#FFA500",
-  failed: "#FF0000",
+  Failed: "#FF0000",
 };
 
 function TransactionCard({ date, time, appName, status, message }) {
@@ -50,15 +50,15 @@ function TransactionHistory() {
     {
       date: "2023-08-16",
       time: "02:15 PM",
-      appName: "Sample App 2",
-      status: "success",
-      message: "Payment processing",
+      appName: "DGSMS",
+      status: "Success",
+      message: "Payment successful!",
     },
     {
       date: "2023-08-15",
       time: "08:45 AM",
-      appName: "Sample App 3",
-      status: "failed",
+      appName: "DGSMS",
+      status: "Failed",
       message: "Changed the transaction",
     },
 

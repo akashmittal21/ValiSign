@@ -5,7 +5,29 @@ import crypto from "crypto";
 import { NetworkInfo } from "react-native-network-info";
 // import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
+import { getEncryptionKeys, deleteLocalTable } from "./DatabaseSetup.js";
 import axios from "axios";
+
+async function fetchEncryptionKeys() {
+  let keys;
+  try {
+    keys = await getEncryptionKeys();
+    // console.log("Encryption keys:", keys);
+  } catch (error) {
+    console.error("Error retrieving encryption keys:", error);
+  }
+
+  const tableToDelete = "EncryptionKeys";
+
+  try {
+    await deleteLocalTable(tableToDelete);
+    console.log(`${tableToDelete} table deleted`);
+  } catch (error) {
+    console.log(`Error deleting ${tableToDelete} table:`, error);
+  }
+
+  return keys;
+}
 
 const generateRandomKey = () => {
   const keyLength = 32; // For AES-256 Bit Encrytion
@@ -67,17 +89,7 @@ const generateConfig = async () => {
   // Server data key -----> only sent during first time login (if login is successful) OR during security update (based on policy)----> further encryption of all data
   // is going to be stored on server side as well local database ----> subjeted to change based on the security policy
 
-  const encryptionKeys = [
-    "T5$okm.$DgZk2Ub.6AJZs%/Cn5pPvRCu",
-    "Qy2fAMzYFZfqZzkcelcafohr%otYx^kx",
-    ".rkZG^qlBiNc&Zm4byRdXgi8ekvwlLbW",
-    "RsUQ&talPqu7C^tRHA&qyE$0Fg^RhK57",
-    "xX.u42bQ6HoamUc8OBXqLT9fhNy&a8b1",
-    ".ZC.1a4ZmQfVCOYKD9OANKI9SbgEGXUt",
-    "SdEoDJepnzz61zjwKuDyB9&.Q6Se3$w.",
-    "D/2FC5N6PVdd&g1QAC$CDl.4OHunESkZ",
-    "gYF%z07%ekh./P/X.e0LZ4kMHj14BY.o",
-  ];
+  const encryptionKeys = await fetchEncryptionKeys();
 
   const randomEncryptionKey =
     encryptionKeys[Math.floor(Math.random() * encryptionKeys.length)];

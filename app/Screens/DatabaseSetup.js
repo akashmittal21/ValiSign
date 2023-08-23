@@ -85,4 +85,42 @@ const createTables = async () => {
   });
 };
 
+export const getEncryptionKeys = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM EncryptionKeys",
+        [],
+        (_, resultSet) => {
+          const keys = [];
+          for (let i = 0; i < resultSet.rows.length; i++) {
+            keys.push(resultSet.rows.item(i).key);
+          }
+          resolve(keys);
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+export const deleteLocalTable = (tableName) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `DROP TABLE IF EXISTS ${tableName}`,
+        [],
+        () => {
+          resolve();
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 export default createTables;

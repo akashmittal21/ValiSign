@@ -10,14 +10,24 @@ import {
   Text,
   Animated,
 } from "react-native";
-// import { Dropdown } from "react-native-element-dropdown";
+import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, StackActions } from "@react-navigation/native";
 
 function Settings() {
   const navigation = useNavigation();
 
+  const [lang, selectLang] = useState(null);
   const [animationValue] = useState(new Animated.Value(1));
+
+  const language = [
+    { label: "English", value: "english" },
+    { label: "Spanish", value: "spanish" },
+    { label: "French", value: "french" },
+    { label: "German", value: "german" },
+    { label: "Hindi", value: "hindi" },
+    // Add more options as needed
+  ];
 
   const handleOnPress = () => {
     // Trigger the animation by updating the animation value
@@ -70,6 +80,39 @@ function Settings() {
           </Animated.View>
         </View>
         <View style={styles.line} />
+        {/* Language Select */}
+        {/* <View style={styles.dropdownContainer}>
+          <View style={styles.rowContainer}>
+            <Text style={[styles.label, styles.labelFlex]}>Language</Text>
+            <Dropdown
+              style={styles.dropdown}
+              containerStyle={styles.shadow}
+              data={language}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Language"
+              value={lang}
+              // onChange={handleDropdownChange}
+              // search={true}
+            />
+          </View>
+        </View> */}
+
+        {/* Theme */}
+        {/* <View style={styles.dropdownContainer}>
+          <Text style={styles.label}>Theme</Text> */}
+        {/* <Dropdown
+            options={[
+              { label: "Light Theme", value: "light" },
+              { label: "Dark Theme", value: "dark" },
+              // Add more theme options as needed
+            ]}
+            onSelect={(value) => {
+              // Handle theme selection here
+              console.log("Selected theme:", value);
+            }}
+          /> */}
+        {/* </View> */}
       </SafeAreaView>
     </ImageBackground>
   );
@@ -110,6 +153,29 @@ const styles = StyleSheet.create({
   logoContainer: {
     flex: 1,
     alignItems: "center",
+  },
+  dropdown: {
+    width: "70%",
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  dropdownContainer: {
+    marginVertical: 20,
+    paddingHorizontal: 25,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  labelFlex: {
+    flex: 1, // Let the label take up a proportionally smaller width
+  },
+  rowContainer: {
+    flexDirection: "row",
+    // alignItems: "center",
+    // alignSelf: "center",
+    justifyContent: "center",
   },
 });
 

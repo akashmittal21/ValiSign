@@ -27,6 +27,7 @@ function WelcomeScreen() {
   };
 
   const [IdText, onChangeID] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
   const [IdEmailNum, onChangeText] = React.useState("");
   const [IdPassword, onChangePassword] = React.useState("");
 
@@ -45,18 +46,6 @@ function WelcomeScreen() {
               source={require("../assets/login/ValisignLogo.png")}
               style={styles.logo}
             />
-            {/* <Text style={styles.text}>Login</Text> */}
-            {/* <View style={styles.inputContainer}>
-                            <FeatherIcons name='user' size={20} padding={10}/>
-                            <TextInput 
-                                style={styles.input} 
-                                autoCorrect = {false}
-                                onChangeText={onChangeID} 
-                                value={IdText}
-                                placeholder='ValiSign ID'
-                                autoCapitalize='none'
-                            />
-                        </View> */}
             <View style={styles.inputContainer}>
               <FeatherIcons name="user" size={20} padding={10} />
               <TextInput
@@ -78,8 +67,15 @@ function WelcomeScreen() {
                 value={IdPassword}
                 placeholder="Password"
                 autoCapitalize="none"
+                secureTextEntry={!showPassword}
                 blurOnSubmit={true}
               />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <FeatherIcons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                />
+              </TouchableOpacity>
             </View>
             <View style={styles.buttonContainer}>
               <Feather.Button
@@ -152,13 +148,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     position: "relative",
     height: 50,
-    width: "70%",
+    width: "80%",
     // borderRadius: ,
     // top: 100
   },
   inputContainer: {
-    // top: 400,
-    // left: 40,
     alignSelf: "center",
     flexDirection: "row",
     // justifyContent: 'center',

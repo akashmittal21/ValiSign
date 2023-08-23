@@ -5,7 +5,6 @@ import {
   ImageBackground,
   SafeAreaView,
   Image,
-  Button,
   TouchableOpacity,
   Text,
   Animated,
@@ -18,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 
 function HomeScreen({ navigation }) {
   const application = [
-    { label: "GroupBenfitz", value: "groupbenefits" },
+    { label: "GroupBenefitz", value: "groupbenefits" },
     { label: "DGSMS", value: "dgsms" },
     // Add more options as needed
   ];
@@ -31,8 +30,15 @@ function HomeScreen({ navigation }) {
   const [countdownTIme, setCountdownTIme] = useState(60);
   const [code, setCode] = useState("");
 
+  const [isOptionSelected, setIsOptionSelected] = useState(false);
+
   const popupOpacity = useRef(new Animated.Value(0)).current;
   const popupScale = useRef(new Animated.Value(1)).current;
+  const buttonBackgroundColor = useRef(new Animated.Value(0)).current;
+
+  const [message, setMessage] = useState(
+    "Changed password, updated account details and updated broker information"
+  );
 
   const handleValisginCode = () => {
     const generateCode = "ABCD123";
@@ -115,6 +121,23 @@ function HomeScreen({ navigation }) {
     });
   };
 
+  const handleDropdownChange = (item) => {
+    selectDropdown(item.value);
+    setIsOptionSelected(true);
+
+    // Animate button opacity
+    Animated.timing(buttonBackgroundColor, {
+      toValue: 1,
+      duration: 300, // Animation duration in milliseconds
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const buttonBackgroundColorInterpolation = buttonBackgroundColor.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#BFBFBF", "#004E8E"], // Grayed out to colored background color
+  });
+
   return (
     <ImageBackground
       source={require("../assets/login/background.png")}
@@ -145,7 +168,8 @@ function HomeScreen({ navigation }) {
             valueField="value"
             placeholder="Select Application"
             value={dropdown}
-            onChange={(item) => selectDropdown(item.value)}
+            onChange={handleDropdownChange}
+            // search={true}
           />
         </View>
         <View style={styles.buttonContainer}>
@@ -154,10 +178,18 @@ function HomeScreen({ navigation }) {
             <Animated.View
               style={[
                 styles.getCodeButton,
-                { transform: [{ scale: popupScale }] },
+                {
+                  // width: windowWidth * 0.45,
+                  transform: [{ scale: popupScale }],
+                  backgroundColor: buttonBackgroundColorInterpolation,
+                },
               ]}
             >
-              <TouchableOpacity onPress={handleValisginCode}>
+              <TouchableOpacity
+                onPress={handleValisginCode}
+                disabled={!isOptionSelected}
+                style={styles.buttonCenterContainer}
+              >
                 <Text style={styles.buttonText}>Get ValiSign Code</Text>
               </TouchableOpacity>
             </Animated.View>
@@ -205,6 +237,7 @@ function HomeScreen({ navigation }) {
                 </View>
               ))}
             </View>
+            <Text style={styles.messageText}>{message}</Text>
           </View>
         </Animated.View>
       )}
@@ -226,16 +259,28 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  buttonCenterContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    // width: "100%",
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   buttonText: {
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
-    marginLeft: 5,
+    // marginLeft: 5,
+    padding: 10,
   },
   closeIconContainer: {
     position: "relative",
     // top: 10,
-    left: 180,
+    left: "40%",
     top: 30,
     // padding: 5,
     borderRadius: 15,
@@ -245,7 +290,7 @@ const styles = StyleSheet.create({
   codeBox: {
     width: 40,
     height: 54,
-    marginLeft: 10,
+    margin: 5,
     backgroundColor: "white",
     borderColor: "#004E8E",
     borderWidth: 1,
@@ -254,10 +299,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   codeContainer: {
-    marginTop: 30,
+    marginTop: 20,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
+    // alignSelf: "center",
+    flexWrap: "nowrap",
+    paddingHorizontal: 20,
   },
   codeText: {
     color: "black",
@@ -304,17 +352,16 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   getCodeButton: {
-    width: "45%",
+    // width: "45%",
     borderColor: "white",
     borderWidth: 1,
     height: 50,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "row",
     backgroundColor: "#004E8E",
     alignSelf: "center",
-    margin: 260, // make the change here to add it to the middle of the screen
+    // margin: 260, // make the change here to add it to the middle of the screen
   },
   header: {
     flexDirection: "row",
@@ -339,6 +386,13 @@ const styles = StyleSheet.create({
     flex: 1, // Occupy remaining space to center the logo
     alignItems: "center", // Center the logo horizontally
   },
+  messageText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 20,
+  },
   popupContent: {
     // backgroundColor: "#27bbff",
     backgroundColor: "#1b91ff",
@@ -346,6 +400,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "white",
     borderWidth: 1,
+    width: "90%",
+    alignSelf: "center",
+    // marginTop: "auto",
   },
   popupContainer: {
     flex: 1,
@@ -367,6 +424,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
+  },
+  disabledButton: {
+    backgroundColor: "#BFBFBF", // Grayed out background color
+    borderColor: "#BFBFBF",
   },
 });
 
