@@ -13,6 +13,8 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, StackActions } from "@react-navigation/native";
+import selectableThemes, { useThemeSelect } from "./ThemeSelect";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Settings() {
   const navigation = useNavigation();
@@ -27,6 +29,11 @@ function Settings() {
     { label: "German", value: "german" },
     { label: "Hindi", value: "hindi" },
     // Add more options as needed
+  ];
+
+  const selectThemes = [
+    { label: "Blue", value: "blue" },
+    { label: "Pink", value: "pink" },
   ];
 
   const handleOnPress = () => {
@@ -46,9 +53,21 @@ function Settings() {
     animationValue.setValue(1);
   }, []);
 
+  const { theme, toggleTheme } = useThemeSelect();
+
+  // Update theme and persist it in AsyncStorage
+  const handleThemeChange = async (newTheme) => {
+    toggleTheme(newTheme); // Update theme in context
+    try {
+      await AsyncStorage.setItem("selectedTheme", JSON.stringify(newTheme)); // Save theme to AsyncStorage
+    } catch (error) {
+      console.error("Error saving selected theme:", error);
+    }
+  };
+
   return (
     <ImageBackground
-      source={require("../assets/login/background.png")}
+      source={selectableThemes[theme].backgroundImage}
       style={styles.background}
     >
       <SafeAreaView style={styles.container}>
@@ -81,22 +100,22 @@ function Settings() {
         </View>
         <View style={styles.line} />
         {/* Language Select */}
-        {/* <View style={styles.dropdownContainer}>
+        <View style={styles.dropdownContainer}>
           <View style={styles.rowContainer}>
-            <Text style={[styles.label, styles.labelFlex]}>Language</Text>
+            <Text style={[styles.label, styles.labelFlex]}>Theme</Text>
             <Dropdown
               style={styles.dropdown}
               containerStyle={styles.shadow}
-              data={language}
+              data={selectThemes}
               labelField="label"
               valueField="value"
-              placeholder="Select Language"
-              value={lang}
-              // onChange={handleDropdownChange}
+              placeholder="Select Theme"
+              value={theme}
+              onChange={handleThemeChange}
               // search={true}
             />
           </View>
-        </View> */}
+        </View>
 
         {/* Theme */}
         {/* <View style={styles.dropdownContainer}>

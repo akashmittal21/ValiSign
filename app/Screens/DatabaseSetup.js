@@ -82,6 +82,17 @@ const createTables = async () => {
         console.log("Error creating LoginDetails table: ", error);
       }
     );
+
+    tx.executeSql(
+      "CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)",
+      [],
+      () => {
+        console.log("LoginDetails table created successfully");
+      },
+      (error) => {
+        console.log("Error creating LoginDetails table: ", error);
+      }
+    );
   });
 };
 

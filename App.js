@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import WelcomeScreen from "./app/Screens/WelcomeScreen";
@@ -6,36 +5,17 @@ import saveConfig from "./app/Screens/Config";
 import createTables from "./app/Screens/DatabaseSetup";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import SideDrawer from "./app/Screens/SideDrawer";
+import { ThemeProvider } from "./app/Screens/ThemeSelect";
 import "react-native-gesture-handler";
+import axios from "axios";
 
 export default function App() {
   const Stack = createStackNavigator();
-  const Drawer = createDrawerNavigator();
-
-  const handleBeforeRemove = (e) => {
-    e.preventDefault();
-  };
-  // For Testing if config object is being generated
-  // useEffect(() => {
-  // testSaveConfig(); // Call the function here
-  // }, []);
-
-  // const testSaveConfig = async () => {
-  // await saveConfig();
-  //   try {
-  //     await createTables();
-  //     await saveConfig();
-  //     console.log("saveConfig function executed successfully");
-  //   } catch (error) {
-  //     console.error("Error testing saveConfig:", error);
-  //   }
-  // };
-  // The lines of above code are for testing purposes only
 
   useEffect(() => {
     checkFirstTimeLaunch();
+    makeApiRequest();
   }, []);
 
   const checkFirstTimeLaunch = async () => {
@@ -46,36 +26,56 @@ export default function App() {
         await saveConfig();
 
         await AsyncStorage.setItem("isFirstTime", "true");
-        console.log(checkFirstTimeLaunch);
+        console.log("First time launch complete");
       }
     } catch (error) {
       console.error("Error checking first time launch:", error);
     }
   };
 
-  return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Welcome"
-        screenOptions={{ headerShown: false, gestureEnabled: false }}
-      >
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Home" component={SideDrawer} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-  // return (
-  //   <NavigationContainer>
-  //     <Drawer.Navigator
-  //       initialRouteName="Welcome"
-  //       screenOptions={{ headerShown: false }}
-  //     >
-  //       <Drawer.Screen name="Welcome" component={WelcomeScreen} />
-  //       <Drawer.Screen name="Home" component={HomeScreen} />
-  //     </Drawer.Navigator>
-  //   </NavigationContainer>
-  // );
+  const makeApiRequest = async () => {
+    try {
+      const API_URL = "https://dev1.valisign.aitestpro.com/app/configure";
 
-  // return <WelcomeScreen />;
-  // return <HomeScreen />;
+      // const response = await axios.post(API_URL, {
+      //   version: "0.0.1",
+      //   deviceType: "iOS",
+      //   data: "GtM6TDI0pbaUT7wlcgj6HiL5BpIAZeRpzwO0ljFGLa0CGSG+XnFXFSrN9N7kJn0F2M2SAyKeZrSREiZoQyrsDO1iaoPotzfYW02UzCyGQUG9YLH+vASlycvEPk3M9snG4MD48ebhBRn8OLlYrTMdE2fgqeYuNML1fSZY9WkWi9ZP2PMCm3cYsamskNJicuQ9Q4+hWEBQIMR5fFuH/ftTvySHd8TWnc04wG0D+aMNo1rSVCSkz7ZwYiIWW5MgXqSA+D7QhXjOvildqJKwzhp6K6NIkI2WwAyRltzsmmajeagiU+47ZyRBwrKMv0CIXW2T",
+      // });
+      // console.log("API Response:", response.data);
+    } catch (error) {
+      console.error("Error making API request:", error);
+    }
+  };
+
+  return (
+    <ThemeProvider defaultTheme="">
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Welcome"
+          screenOptions={{ headerShown: false, gestureEnabled: false }}
+        >
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Home" component={SideDrawer} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
+  );
 }
+
+// For Testing if config object is being generated
+// useEffect(() => {
+// testSaveConfig(); // Call the function here
+// }, []);
+
+// const testSaveConfig = async () => {
+// await saveConfig();
+//   try {
+//     await createTables();
+//     await saveConfig();
+//     console.log("saveConfig function executed successfully");
+//   } catch (error) {
+//     console.error("Error testing saveConfig:", error);
+//   }
+// };
+// The lines of above code are for testing purposes only

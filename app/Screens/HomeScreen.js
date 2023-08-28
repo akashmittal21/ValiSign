@@ -244,12 +244,14 @@ function HomeScreen({ navigation }) {
               </CountdownCircleTimer>
             </View>
           </View>
-          <TouchableOpacity
-            onPress={closePopup}
-            style={styles.cancelButtonContainer}
-          >
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity onPress={closePopup} style={styles.cancelButton}>
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={closePopup} style={styles.doneButton}>
+              <Text style={styles.doneText}>Done</Text>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
       )}
     </ImageBackground>
@@ -281,6 +283,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 40,
+  },
   buttonText: {
     color: "white",
     fontSize: 20,
@@ -298,15 +305,16 @@ const styles = StyleSheet.create({
     // backgroundColor: "white",
     zIndex: 1, // Make sure the icon appears above the popup content
   },
-  cancelButtonContainer: {
+  cancelButton: {
     // flex: 1,
-    marginTop: 40,
+    // marginTop: 40,
     backgroundColor: "#FF3F3F",
     justifyContent: "center",
     alignSelf: "center",
-    borderColor: "white",
+    // borderColor: "white",
     borderRadius: 10,
     borderWidth: 1,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -319,7 +327,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
-    padding: 12,
+    padding: 10,
   },
   codeBox: {
     width: 40,
@@ -373,6 +381,31 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: "#BFBFBF", // Grayed out background color
     borderColor: "#BFBFBF",
+  },
+  doneButton: {
+    // flex: 1,
+    // marginTop: 40,
+    backgroundColor: "#1b91ff",
+    justifyContent: "center",
+    alignSelf: "center",
+    // borderColor: "white",
+    borderRadius: 10,
+    // borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginLeft: 40,
+  },
+  doneText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+    padding: 10,
   },
   dropdownContainer: {
     width: "90%",
@@ -439,15 +472,21 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center the logo horizontally
   },
   popupContent: {
-    // backgroundColor: "#27bbff",
-    backgroundColor: "#1b91ff",
+    backgroundColor: "#00256b",
     padding: 20,
-    borderRadius: 10,
-    borderColor: "white",
+    borderRadius: 15,
     borderWidth: 1,
+    borderColor: "white", // Match the background color for a seamless look
     width: "90%",
     alignSelf: "center",
-    // marginTop: "auto",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   popupContainer: {
     flex: 1,
@@ -458,7 +497,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    backgroundColor: "rgba(0, 0, 0, 0.75)",
   },
   shadow: {
     shadowColor: "#000",

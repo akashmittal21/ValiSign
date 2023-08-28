@@ -73,9 +73,11 @@ const generateConfig = async () => {
   const deviceIp = await NetworkInfo.getIPAddress();
   const deviceLocation = await getLocation();
   const firstDataKey = generateRandomKey(); // is going to be saved for further decryption stored in FirstTimeUsage LOCAL DATABASE
+
+  const deviceId = await DeviceInfo.getUniqueId();
   const data = {
     checkPhrase: "ValiSign Calling",
-    deviceId: DeviceInfo.getUniqueId(),
+    deviceId: deviceId,
     deviceType,
     deviceLocation,
     deviceIp,
@@ -94,9 +96,13 @@ const generateConfig = async () => {
   const randomEncryptionKey =
     encryptionKeys[Math.floor(Math.random() * encryptionKeys.length)];
 
+  console.log("Encryption Key: ", randomEncryptionKey);
+
   const iv = "e93jGXDcjXPbSOAE"; // 16 byte IV for AES-CBC
 
   const dataStr = JSON.stringify(data);
+
+  console.log("data string: ", dataStr);
 
   const encryptedData = encryptData(dataStr, randomEncryptionKey, iv);
 
