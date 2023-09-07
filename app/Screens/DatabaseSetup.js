@@ -24,7 +24,7 @@ const createTables = async () => {
   db.transaction((tx) => {
     // Table to track first-time usage
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS FirstTimeUsage (id INTEGER PRIMARY KEY AUTOINCREMENT, isFirstTime INTEGER, userDataKey TEXT)",
+      "CREATE TABLE IF NOT EXISTS FirstTimeUsage (id INTEGER PRIMARY KEY AUTOINCREMENT, isFirstTime INTEGER, userDataKey TEXT, valiSignDeviceID TEXT)",
       [],
       () => {
         console.log("FirstTimeUsage table created successfully");
@@ -84,7 +84,7 @@ const createTables = async () => {
     );
 
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)",
+      "CREATE TABLE IF NOT EXISTS UserSettings (id INTEGER PRIMARY KEY AUTOINCREMENT, theme TEXT, language TEXT)",
       [],
       () => {
         console.log("LoginDetails table created successfully");
@@ -125,6 +125,52 @@ export const deleteLocalTable = (tableName) => {
         [],
         () => {
           resolve();
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+export const storeFirstTimeUsage = (
+  isFirstTime,
+  userDataKey,
+  valiSignDeviceID
+) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO FirstTimeUsage (isFirstTime, userDataKey, valiSignDeviceID) VALUES (?, ?, ?)",
+        [isFirstTime ? 1 : 0, userDataKey, valiSignDeviceID],
+        () => {
+          // The insert was successful, resolve the promise
+          resolve();
+          console.log("Details Successfully stored.");
+        },
+        (_, error) => {
+          // An error occurred, reject the promise with the error
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+export const fetchUserDataAndDeviceID = () => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT userDataKey, valiSignDeviceID FROM FirstTimeUsage WHERE id = (SELECT MAX(id) FROM FirstTimeUsage)",
+        [],
+        (_, resultSet) => {
+          if (resultSet.rows.length > 0) {
+            const { userDataKey, valiSignDeviceID } = resultSet.rows.item(0);
+            resolve({ userDataKey, valiSignDeviceID });
+          } else {
+            resolve(null); // No records found
+          }
         },
         (_, error) => {
           reject(error);

@@ -1,12 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import "../../shim.js";
 import DeviceInfo from "react-native-device-info";
-import crypto from "crypto";
 import { NetworkInfo } from "react-native-network-info";
-// import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
-import { getEncryptionKeys, deleteLocalTable } from "./DatabaseSetup.js";
-import axios from "axios";
+import {
+  getEncryptionKeys,
+  deleteLocalTable,
+  storeFirstTimeUsage,
+} from "./DatabaseSetup.js";
+import { encryptData, decryptData, makeApiRequest } from "./AppUtil.js";
 
 async function fetchEncryptionKeys() {
   let keys;
@@ -40,13 +41,6 @@ const generateRandomKey = () => {
   return key;
 };
 
-const encryptData = (data, encryptionKey, iv) => {
-  const cipher = crypto.createCipheriv("aes-256-cbc", encryptionKey, iv);
-  let encryptedData = cipher.update(data, "utf8", "base64");
-  encryptedData += cipher.final("base64");
-  return encryptedData;
-};
-
 const getLocation = async () => {
   try {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -67,12 +61,12 @@ const getLocation = async () => {
   }
 };
 
-const generateConfig = async () => {
+const generateConfig = async (firstDataKey) => {
   const version = "0.0.1";
   const deviceType = DeviceInfo.getSystemName();
   const deviceIp = await NetworkInfo.getIPAddress();
   const deviceLocation = await getLocation();
-  const firstDataKey = generateRandomKey(); // is going to be saved for further decryption stored in FirstTimeUsage LOCAL DATABASE
+  // const firstDataKey = generateRandomKey(); // is going to be saved for further decryption stored in FirstTimeUsage LOCAL DATABASE
 
   const deviceId = await DeviceInfo.getUniqueId();
   const data = {
@@ -81,15 +75,15 @@ const generateConfig = async () => {
     deviceType,
     deviceLocation,
     deviceIp,
-    datakey: firstDataKey, // this key will be saved on the device after first configuration
+    datakey: firstDataKey, // this key will be saved on the device after first configuration --- come from server
   };
 
   // Three keys:     1. One of the 8 keys ----> config api payload ----> random
-  //                 2. Genreated on the device -----> encrypt login information for first time login/ further logins (maybe) ----> random
-  //                 3. Generated on the server -----> is going to be sent after first successul login ----> updated after a certain period of time based on secuirty policy
+  //                 2. Generated on the device -----> encrypt login information for first time login/ further logins (maybe) ----> random
+  //                 3. Generated on the server -----> is going to be sent after first successful login ----> updated after a certain period of time based on security policy
 
   // Server data key -----> only sent during first time login (if login is successful) OR during security update (based on policy)----> further encryption of all data
-  // is going to be stored on server side as well local database ----> subjeted to change based on the security policy
+  // is going to be stored on server side as well local database ----> subjected to change based on the security policy
 
   const encryptionKeys = await fetchEncryptionKeys();
 
@@ -98,13 +92,11 @@ const generateConfig = async () => {
 
   console.log("Encryption Key: ", randomEncryptionKey);
 
-  const iv = "e93jGXDcjXPbSOAE"; // 16 byte IV for AES-CBC
-
   const dataStr = JSON.stringify(data);
 
   console.log("data string: ", dataStr);
 
-  const encryptedData = encryptData(dataStr, randomEncryptionKey, iv);
+  const encryptedData = encryptData(dataStr, randomEncryptionKey);
 
   const config = {
     version,
@@ -116,22 +108,6 @@ const generateConfig = async () => {
 };
 
 const saveConfig = async () => {
-  //   const key = "JiNiX3dCROGw/az82Z0hcA/%O2S7qwPr"; // 32 byte key for AES-25
-
-  //   const iv = "e93jGXDcjXPbSOAE";
-
-  //   const encrypted =
-  //     "aBWhSTIf29DPPXf5UJTv+VZGU01icQLopGhMbZ4/GxCREfPcDyJ8NVZzNm+aJECx";
-  //   try {
-  //     const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-  //     let decrypted = decipher.update(encrypted, "base64", "utf8");
-  //     decrypted += decipher.final("utf8");
-
-  //     console.log(decrypted);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-
   //   validate the resposnse
 
   //   const text = { checkPhrase: "ValiSign Calling" };
@@ -146,18 +122,25 @@ const saveConfig = async () => {
 
   //   console.log(encrypted);
 
+  const tempKey = generateRandomKey();
+
   try {
-    const config = await generateConfig();
+    const config = await generateConfig(tempKey);
     const jsonConfig = JSON.stringify(config);
     await AsyncStorage.setItem("Config", jsonConfig);
     console.log("Config saved:", jsonConfig);
 
-    // Making the API request
-    // const response = await axios.post(
-    //   "https://dev.valisign.aitestpro.com/api/vs/app/configure",
-    //   config
-    // );
-    // console.log("API request successful:", response.data);
+    const API_URL = "https://dev1.valisign.aitestpro.com/app/configure";
+
+    configResponse = await makeApiRequest(API_URL, config);
+
+    if (configResponse.statusCode === "IBVS_CONF_SUCCESS") {
+      // console.log(configResponse.data);
+      deviceData = JSON.parse(decryptData(configResponse.data, tempKey));
+      console.log(deviceData);
+      storeFirstTimeUsage(true, deviceData.dataKey, deviceData.identifier);
+      // console.log(decryptData(configResponse.data, tempKey));
+    }
   } catch (error) {
     console.error("Error saving config:", error);
   }

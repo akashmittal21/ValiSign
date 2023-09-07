@@ -100,18 +100,20 @@ function Settings() {
         </View>
         <View style={styles.line} />
         {/* Language Select */}
-        <View style={styles.dropdownContainer}>
+        <View style={styles.settingContainer}>
           <View style={styles.rowContainer}>
             <Text style={[styles.label, styles.labelFlex]}>Theme</Text>
             <Dropdown
               style={styles.dropdown}
-              containerStyle={styles.shadow}
+              containerStyle={styles.themeDropdown}
               data={selectThemes}
               labelField="label"
               valueField="value"
               placeholder="Select Theme"
               value={theme}
               onChange={handleThemeChange}
+              placeholderStyle={{ paddingLeft: 10 }}
+              selectedTextStyle={{ paddingLeft: 10 }}
               // search={true}
             />
           </View>
@@ -174,27 +176,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dropdown: {
-    width: "70%",
+    width: "80%",
     backgroundColor: "white",
     borderRadius: 10,
   },
-  dropdownContainer: {
+  settingContainer: {
     marginVertical: 20,
     paddingHorizontal: 25,
   },
   label: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    // marginBottom: 10,
+    color: "white",
+    paddingLeft: 5,
   },
   labelFlex: {
     flex: 1, // Let the label take up a proportionally smaller width
   },
   rowContainer: {
     flexDirection: "row",
-    // alignItems: "center",
-    // alignSelf: "center",
+    alignItems: "center",
+    alignSelf: "center",
     justifyContent: "center",
+  },
+  themeDropdown: {
+    borderRadius: 10,
+    // height: "70%",
   },
 });
 

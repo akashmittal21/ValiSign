@@ -15,7 +15,7 @@ ConfigTest.js
 .gitignore
 HomeScreenTest.js
 TransactionHistoryTest.js
-
+*.nvmrc
 # macOS
 .DS_Store
 

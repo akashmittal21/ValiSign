@@ -18,18 +18,79 @@ import Fontiso from "react-native-vector-icons/Fontisto";
 import Feather from "@expo/vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
+import { fetchUserDataAndDeviceID } from "./DatabaseSetup";
+import { decryptData, encryptData, makeApiRequest } from "./AppUtil";
+
+let listOfApplications = [];
 
 function WelcomeScreen() {
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    navigation.navigate("Home");
+  const handleLogin = async () => {
+    const userDetails = {
+      username: IdEmailNum,
+      password: IdPassword,
+    };
+
+    const userDetailsString = JSON.stringify(userDetails);
+
+    setLoading(true);
+
+    try {
+      const result = await fetchUserDataAndDeviceID();
+
+      if (result) {
+        const { userDataKey, valiSignDeviceID } = result;
+
+        const encryptedCredentials = encryptData(
+          userDetailsString,
+          userDataKey
+        );
+
+        console.log(userDataKey);
+
+        const payload = {
+          identifier: valiSignDeviceID,
+          data: encryptedCredentials,
+        };
+
+        console.log(payload);
+
+        const API_URL = "https://dev1.valisign.aitestpro.com/signIn";
+        const loginResponse = await makeApiRequest(API_URL, payload);
+
+        // console.log(listOfApplications);
+
+        if (loginResponse.message === "Sign-in successful") {
+          const listOfApplicationString = decryptData(
+            loginResponse.ListOFApplication,
+            userDataKey
+          );
+          const loa = JSON.parse(listOfApplicationString).token;
+          listOfApplications = JSON.parse(loa);
+
+          navigation.navigate("Home");
+        } else {
+          Alert.alert("Login failed! Please check your username/password");
+        }
+      } else {
+        console.log("No user data and device ID found.");
+      }
+    } catch (error) {
+      Alert.alert("Login Failed! Please check your username/password");
+      // console.log(error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+
+    // navigation.navigate("Home");
   };
 
   const [IdText, onChangeID] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [IdEmailNum, onChangeText] = React.useState("");
   const [IdPassword, onChangePassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   return (
     <ImageBackground
@@ -81,11 +142,11 @@ function WelcomeScreen() {
               <Feather.Button
                 name="log-in"
                 style={[styles.button, (width = "100%")]}
-                backgroundColor="#004E8E"
+                backgroundColor="#242c64"
                 borderRadius={10}
                 onPress={handleLogin}
               >
-                Login
+                {loading ? "Loading..." : "Login"}
               </Feather.Button>
             </View>
             <TouchableOpacity
@@ -181,3 +242,4 @@ const styles = StyleSheet.create({
 });
 
 export default WelcomeScreen;
+export { listOfApplications };

@@ -13,19 +13,25 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import { listOfApplications } from "./WelcomeScreen";
 import { useNavigation } from "@react-navigation/native";
 
 function HomeScreen({ navigation }) {
-  const application = [
-    { label: "GroupBenefitz", value: "groupbenefits" },
-    { label: "DGSMS", value: "dgsms" },
-    // Add more options as needed
-  ];
+  const application = listOfApplications.map((app) => ({
+    label: app.name,
+    value: app.id, // Convert id to a string if needed
+  }));
+
+  // const application = [
+  //   { label: "GroupBenefitz", value: "groupbenefits" },
+  //   { label: "DGSMS", value: "dgsms" },
+  //   // Add more options as needed
+  // ];
 
   const [dropdown, selectDropdown] = useState(null);
   const [select, selected] = useState(null);
 
-  // const windowWidth = Dimensions.get("window").width;
+  // const windowWidth = Dimensions.get("window").width;b
   const [showPopup, setShowPopup] = useState(false);
   const [countdownTIme, setCountdownTIme] = useState(60);
   const [code, setCode] = useState("");
@@ -135,7 +141,7 @@ function HomeScreen({ navigation }) {
 
   const buttonBackgroundColorInterpolation = buttonBackgroundColor.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#BFBFBF", "#004E8E"], // Grayed out to colored background color
+    outputRange: ["#BFBFBF", "#242c64"], // Grayed out to colored background color
   });
 
   return (
@@ -432,7 +438,7 @@ const styles = StyleSheet.create({
   },
   getCodeButton: {
     // width: "45%",
-    borderColor: "white",
+    // borderColor: "white",
     borderWidth: 1,
     height: 50,
     borderRadius: 10,
@@ -472,11 +478,11 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center the logo horizontally
   },
   popupContent: {
-    backgroundColor: "#00256b",
+    backgroundColor: "#242c64",
     padding: 20,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: "white", // Match the background color for a seamless look
+    // borderColor: "white", // Match the background color for a seamless look
     width: "90%",
     alignSelf: "center",
     shadowColor: "#000",

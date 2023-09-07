@@ -108,6 +108,7 @@ function SideDrawer() {
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
+    zIndex: 1,
   },
   closeButton: {
     padding: 16,
