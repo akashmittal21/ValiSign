@@ -14,7 +14,6 @@ import {
   encryptData,
   makeApiRequest,
 } from "./app/Screens/AppUtil";
-
 export default function App() {
   const Stack = createStackNavigator();
 
@@ -45,7 +44,14 @@ export default function App() {
           screenOptions={{ headerShown: false, gestureEnabled: false }}
         >
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="Home" component={SideDrawer} />
+          <Stack.Screen
+            name="Home"
+            component={SideDrawer}
+            options={{
+              presentation: "card", // Make it a modal screen
+              cardStyle: { backgroundColor: "transparent" }, // Set background color to transparent
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </ThemeProvider>

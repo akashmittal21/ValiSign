@@ -22,6 +22,8 @@ import { fetchUserDataAndDeviceID } from "./DatabaseSetup";
 import { decryptData, encryptData, makeApiRequest } from "./AppUtil";
 
 let listOfApplications = [];
+let userID = "";
+let token = "";
 
 function WelcomeScreen() {
   const navigation = useNavigation();
@@ -47,8 +49,6 @@ function WelcomeScreen() {
           userDataKey
         );
 
-        console.log(userDataKey);
-
         const payload = {
           identifier: valiSignDeviceID,
           data: encryptedCredentials,
@@ -56,18 +56,24 @@ function WelcomeScreen() {
 
         console.log(payload);
 
-        const API_URL = "https://dev1.valisign.aitestpro.com/signIn";
+        const API_URL = "https://dev1.valisign.aitestpro.com/auth/signIn";
         const loginResponse = await makeApiRequest(API_URL, payload);
 
         // console.log(listOfApplications);
 
+        // console.log(typeof loginResponse);
+
         if (loginResponse.message === "Sign-in successful") {
           const listOfApplicationString = decryptData(
-            loginResponse.ListOFApplication,
+            loginResponse.data,
             userDataKey
           );
-          const loa = JSON.parse(listOfApplicationString).token;
-          listOfApplications = JSON.parse(loa);
+          console.log(listOfApplicationString);
+
+          const loa = JSON.parse(listOfApplicationString).ListOFApplication;
+          userID = JSON.parse(listOfApplicationString).userId;
+          token = JSON.parse(listOfApplicationString).token;
+          listOfApplications = loa;
 
           navigation.navigate("Home");
         } else {
@@ -146,7 +152,7 @@ function WelcomeScreen() {
                 borderRadius={10}
                 onPress={handleLogin}
               >
-                {loading ? "Loading..." : "Login"}
+                {loading ? "Logging In..." : "Login"}
               </Feather.Button>
             </View>
             <TouchableOpacity
@@ -242,4 +248,4 @@ const styles = StyleSheet.create({
 });
 
 export default WelcomeScreen;
-export { listOfApplications };
+export { listOfApplications, userID, token };

@@ -19,6 +19,8 @@ const decryptData = (encryptedString, key) => {
 };
 
 const makeApiRequest = async (API_URL, config) => {
+  // const response = await axios.post(API_URL, config);
+  // console.log(response);
   try {
     const response = await axios.post(API_URL, config);
     console.log("API request successful:", response.data);
@@ -29,4 +31,15 @@ const makeApiRequest = async (API_URL, config) => {
   }
 };
 
-export { encryptData, decryptData, makeApiRequest };
+const makeApiRequestWithHeader = async (API_URL, config, header) => {
+  try {
+    const response = await axios.post(API_URL, config, { headers: header });
+    console.log("API request successful:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("API request failed:", error);
+    throw error;
+  }
+};
+
+export { encryptData, decryptData, makeApiRequest, makeApiRequestWithHeader };

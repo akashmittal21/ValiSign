@@ -134,7 +134,7 @@ const saveConfig = async () => {
 
     configResponse = await makeApiRequest(API_URL, config);
 
-    if (configResponse.statusCode === "IBVS_CONF_SUCCESS") {
+    if (configResponse.status === 200) {
       // console.log(configResponse.data);
       deviceData = JSON.parse(decryptData(configResponse.data, tempKey));
       console.log(deviceData);

@@ -9,12 +9,15 @@ import {
   Text,
   Animated,
   Easing,
+  Alert,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
-import { listOfApplications } from "./WelcomeScreen";
-import { useNavigation } from "@react-navigation/native";
+import { listOfApplications, token, userID } from "./WelcomeScreen";
+import { decryptData, encryptData, makeApiRequestWithHeader } from "./AppUtil";
+import { fetchUserDataAndDeviceID } from "./DatabaseSetup";
+import * as Animatable from "react-native-animatable";
 
 function HomeScreen({ navigation }) {
   const application = listOfApplications.map((app) => ({
@@ -22,19 +25,14 @@ function HomeScreen({ navigation }) {
     value: app.id, // Convert id to a string if needed
   }));
 
-  // const application = [
-  //   { label: "GroupBenefitz", value: "groupbenefits" },
-  //   { label: "DGSMS", value: "dgsms" },
-  //   // Add more options as needed
-  // ];
-
   const [dropdown, selectDropdown] = useState(null);
   const [select, selected] = useState(null);
 
-  // const windowWidth = Dimensions.get("window").width;b
   const [showPopup, setShowPopup] = useState(false);
-  const [countdownTIme, setCountdownTIme] = useState(60);
+  const [countdownTime, setCountdownTime] = useState("");
   const [code, setCode] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
+  const [selectedAppName, setSelectedAppName] = useState("");
 
   const [isOptionSelected, setIsOptionSelected] = useState(false);
 
@@ -46,9 +44,84 @@ function HomeScreen({ navigation }) {
     "Changed password, updated account details and updated broker information"
   );
 
-  const handleValisginCode = () => {
-    const generateCode = "ABCD123";
-    setCode(generateCode);
+  const handleValisignCode = async () => {
+    setIsFetching(true);
+    const result = await fetchUserDataAndDeviceID();
+    const { userDataKey, valiSignDeviceID } = result;
+
+    if (!selectDropdown) {
+      // Handle case when no application is selected
+      return;
+    }
+
+    // Find the selected application object based on its value
+    const selectedApplication = application.find(
+      (app) => app.value === dropdown
+    );
+
+    if (!selectedApplication) {
+      // Handle case when the selected application is not found
+      return;
+    }
+
+    const selectedApplicationName = selectedApplication.label;
+    const selectedApplicationValue = selectedApplication.value;
+
+    // Create the payload with the selected application's name and value
+    const appDetail = {
+      appName: selectedApplicationName,
+      appId: selectedApplicationValue,
+      userId: userID,
+    };
+
+    const appDetailString = JSON.stringify(appDetail);
+
+    const encryptedAppDetail = encryptData(appDetailString, userDataKey);
+
+    const api_url = "https://dev1.valisign.aitestpro.com/getValisignCode";
+
+    const header = {
+      Authorization: `Bearer ${token}`,
+      "Content-type": "application/json",
+    };
+
+    const payload = {
+      identifier: valiSignDeviceID,
+      data: encryptedAppDetail,
+    };
+
+    console.log(payload);
+
+    try {
+      const getValisignResponse = await makeApiRequestWithHeader(
+        api_url,
+        payload,
+        header
+      );
+
+      if (getValisignResponse.status === 200) {
+        console.log(userDataKey);
+        const getValisignDataString = decryptData(
+          getValisignResponse.data,
+          userDataKey
+        );
+        console.log("This is unencrypted string: ", getValisignDataString);
+        const getValisignData = JSON.parse(getValisignDataString);
+        const generatedCode = getValisignData.valisignOTP;
+        const validTime = getValisignData.OTPTime;
+        setCode(generatedCode);
+        setCountdownTime(validTime);
+        setShowPopup(true);
+      } else {
+        Alert.alert("ValiSign Code is not requested");
+      }
+    } catch (error) {
+      Alert.alert("ValiSign Code is not requested");
+      // console.log(error);
+    } finally {
+      setIsFetching(false);
+    }
+    // setCode(generateCode);
 
     // Animate the button into the popup
     Animated.parallel([
@@ -64,7 +137,7 @@ function HomeScreen({ navigation }) {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      setShowPopup(true);
+      // setShowPopup(true);
       // Animate the popup content
       Animated.parallel([
         Animated.timing(popupOpacity, {
@@ -131,6 +204,9 @@ function HomeScreen({ navigation }) {
     selectDropdown(item.value);
     setIsOptionSelected(true);
 
+    // Update the selected application name when an application is chosen
+    setSelectedAppName(item.label);
+
     // Animate button opacity
     Animated.timing(buttonBackgroundColor, {
       toValue: 1,
@@ -175,6 +251,8 @@ function HomeScreen({ navigation }) {
             placeholder="Select Application"
             value={dropdown}
             onChange={handleDropdownChange}
+            itemContainerStyle={styles.dropdownItemContainer}
+            activeColor="#d1d3df"
             // search={true}
           />
         </View>
@@ -192,11 +270,13 @@ function HomeScreen({ navigation }) {
               ]}
             >
               <TouchableOpacity
-                onPress={handleValisginCode}
+                onPress={handleValisignCode}
                 disabled={!isOptionSelected}
                 style={styles.buttonCenterContainer}
               >
-                <Text style={styles.buttonText}>Get ValiSign Code</Text>
+                <Text style={styles.buttonText}>
+                  {isFetching ? "Fetching Code..." : "Get ValiSign Code"}
+                </Text>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -219,7 +299,7 @@ function HomeScreen({ navigation }) {
           </TouchableOpacity> */}
           <View style={styles.popupContent}>
             <Text style={styles.headerText}>
-              GroupBenefitz wants you to validate the following transaction
+              {selectedAppName} wants to validate the following transaction
             </Text>
             <View style={styles.transactionContainer}>
               <Text style={styles.transactionText}>{message}</Text>
@@ -236,7 +316,7 @@ function HomeScreen({ navigation }) {
             <View style={styles.countdownContainer}>
               <CountdownCircleTimer
                 isPlaying
-                duration={countdownTIme}
+                duration={countdownTime}
                 colors={["#FFF", "#FF3F3F", "#FF1919"]}
                 colorsTime={[60, 55, 0]}
                 onComplete={handleOnComplete}
@@ -433,6 +513,16 @@ const styles = StyleSheet.create({
 
     elevation: 2,
   },
+  dropdownItemContainer: {
+    // paddingHorizontal: 16,
+    // paddingVertical: 12,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#222f67",
+    backgroundColor: "white", // Background color of each dropdown item
+    borderRadius: 12,
+    height: 50,
+  },
   dropdownItem: {
     justifyContent: "flex-start",
   },
@@ -506,6 +596,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.75)",
   },
   shadow: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    // paddingHorizontal: 10,
+    // paddingVertical: 5,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
